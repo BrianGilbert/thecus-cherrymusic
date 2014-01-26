@@ -1,0 +1,51 @@
+#!/bin/sh
+#start up script for module
+
+module_name=$2
+
+PATH=/raid/data/module/apache/sys/bin:/raid/data/module/ModBase1/system/bin:/raid/data/module/ffmpeg/sys/bin:$PATH
+export PATH
+
+LD_LIBRARY_PATH=/raid/data/module/ModBase1/system/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH
+
+export GIT_SSL_NO_VERIFY=true
+
+INSTALL_DIR=/raid/data/module/CherryMusic/bin
+CHERRY="${INSTALL_DIR}/cherrymusic"
+mkdir -p "${INSTALL_DIR}/var"
+PID_FILE="${INSTALL_DIR}/var/cherry.pid"
+mkdir -p "${INSTALL_DIR}/Data"
+DATA_DIR="${INSTALL_DIR}/Data"
+
+
+#Function
+start(){
+  echo "CherryMusic start"
+  cd /raid/data/module/CherryMusic/bin
+  /raid/data/module/apache/sys/bin/python ${CHERRY} --setup --port 8091 > /dev/null 2>&1 &
+}
+
+stop(){
+  echo "CherryMusic stop"
+
+/raid/data/module/apache/sys/bin/pkill -f "cherrymusic" > /dev/null 2>&1
+
+}
+
+#Switch Case
+case "$1" in
+  boot)
+    start
+    ;;
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  *)
+    echo "Usage: $module_name {boot|start|stop}"
+    exit 1
+    ;;
+esac
